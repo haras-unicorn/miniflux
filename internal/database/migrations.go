@@ -257,11 +257,7 @@ var migrations = []func(tx *sql.Tx) error{
 		return err
 	},
 	func(tx *sql.Tx) (err error) {
-		sql := `
-			ALTER TABLE user_sessions ALTER COLUMN ip SET DATA TYPE inet using ip::inet;
-		`
-		_, err = tx.Exec(sql)
-		return err
+		return nil
 	},
 	func(tx *sql.Tx) (err error) {
 		sql := `
