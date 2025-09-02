@@ -77,7 +77,7 @@ func (s *Storage) UpdateEntryTitleAndContent(entry *model.Entry) error {
 			title=$1,
 			content=$2,
 			reading_time=$3,
-			document_vectors = setweight(to_tsvector($4), 'A') || setweight(to_tsvector($5), 'B')
+			document_vectors = to_tsvector(substring($4 || ' ' || $4 || ' ' || coalesce($5, '') for 1000000))
 		WHERE
 			id=$6 AND user_id=$7
 	`
@@ -130,7 +130,7 @@ func (s *Storage) createEntry(tx *sql.Tx, entry *model.Entry) error {
 				$9,
 				$10,
 				now(),
-				setweight(to_tsvector($11), 'A') || setweight(to_tsvector($12), 'B'),
+				to_tsvector(substring($11 || ' ' || $11 || ' ' || coalesce($12, '') for 1000000)),
 				$13
 			)
 		RETURNING
@@ -188,7 +188,7 @@ func (s *Storage) updateEntry(tx *sql.Tx, entry *model.Entry) error {
 			content=$4,
 			author=$5,
 			reading_time=$6,
-			document_vectors = setweight(to_tsvector($7), 'A') || setweight(to_tsvector($8), 'B'),
+			document_vectors =  to_tsvector(substring($7 || ' ' || $7 || ' ' || coalesce($8, '') for 1000000)),
 			tags=$12
 		WHERE
 			user_id=$9 AND feed_id=$10 AND hash=$11

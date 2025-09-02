@@ -277,7 +277,7 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		sql := `
-			UPDATE entries SET document_vectors = to_tsvector(substring(title || ' ' || coalesce(content, '') for 1000000));
+			UPDATE entries SET document_vectors = to_tsvector(substring(title || ' ' || title || ' ' || coalesce(content, '') for 1000000));
 			CREATE INDEX document_vectors_idx ON entries USING gin(document_vectors);
 		`
 		_, err = tx.Exec(sql)
@@ -285,16 +285,6 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		sql := `ALTER TABLE feeds ADD COLUMN user_agent text default ''`
-		_, err = tx.Exec(sql)
-		return err
-	},
-	func(tx *sql.Tx) (err error) {
-		sql := `
-			UPDATE
-				entries
-			SET
-				document_vectors = setweight(to_tsvector(substring(coalesce(title, '') for 1000000)), 'A') || setweight(to_tsvector(substring(coalesce(content, '') for 1000000)), 'B')
-		`
 		_, err = tx.Exec(sql)
 		return err
 	},
