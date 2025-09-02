@@ -271,6 +271,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE entries ADD COLUMN document_vectors tsvector;
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			UPDATE entries SET document_vectors = to_tsvector(substring(title || ' ' || coalesce(content, '') for 1000000));
 			CREATE INDEX document_vectors_idx ON entries USING gin(document_vectors);
 		`
@@ -315,6 +321,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE entries ADD COLUMN changed_at timestamp with time zone;
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			UPDATE entries SET changed_at = published_at;
 			ALTER TABLE entries ALTER COLUMN changed_at SET not null;
 		`
@@ -340,6 +352,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE entries ADD COLUMN share_code text not null default '';
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			CREATE UNIQUE INDEX entries_share_code_idx ON entries USING btree(share_code) WHERE share_code <> '';
 		`
 		_, err = tx.Exec(sql)
@@ -353,6 +371,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE feeds ADD COLUMN next_check_at timestamp with time zone default now();
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			CREATE INDEX entries_user_feed_idx ON entries (user_id, feed_id);
 		`
 		_, err = tx.Exec(sql)
@@ -420,6 +444,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE entries ADD COLUMN created_at timestamp with time zone not null default now();
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			UPDATE entries SET created_at = published_at;
 		`
 		_, err = tx.Exec(sql)
@@ -468,6 +498,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			CREATE TYPE webapp_display_mode AS enum('fullscreen', 'standalone', 'minimal-ui', 'browser');
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			ALTER TABLE users ADD COLUMN display_mode webapp_display_mode default 'standalone';
 		`
 		_, err = tx.Exec(sql)
@@ -503,6 +539,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			CREATE TYPE entry_sorting_order AS enum('published_at', 'created_at');
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			ALTER TABLE users ADD COLUMN entry_order entry_sorting_order default 'published_at';
 		`
 		_, err = tx.Exec(sql)
@@ -982,6 +1024,12 @@ var migrations = []func(tx *sql.Tx) error{
 	func(tx *sql.Tx) (err error) {
 		sql := `
 			ALTER TABLE icons ADD COLUMN external_id text default '';
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
 			CREATE UNIQUE INDEX icons_external_id_idx ON icons USING btree(external_id) WHERE external_id <> '';
 		`
 		_, err = tx.Exec(sql)
