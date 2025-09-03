@@ -628,10 +628,21 @@ var migrations = []func(tx *sql.Tx) error{
 	},
 	func(tx *sql.Tx) (err error) {
 		sql := `
-			ALTER TABLE users RENAME double_tap TO gesture_nav;
-			ALTER TABLE users
-				ALTER COLUMN gesture_nav SET DATA TYPE text using case when gesture_nav = true then 'tap' when gesture_nav = false then 'none' end,
-				ALTER COLUMN gesture_nav SET default 'tap';
+			ALTER TABLE users ADD COLUMN gesture_nav text DEFAULT 'tap' NOT NULL;
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
+			UPDATE users SET gesture_nav = CASE WHEN double_tap THEN 'tap' ELSE 'none' END;
+		`
+		_, err = tx.Exec(sql)
+		return err
+	},
+	func(tx *sql.Tx) (err error) {
+		sql := `
+			ALTER TABLE users DROP COLUMN double_tap;
 		`
 		_, err = tx.Exec(sql)
 		return err
